@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        .nav{
+            width: 100%;
+            height: 100px;
+            background-color: lightblue;
+            display: flex;
+            padding: 10px;
+        }
+        .nav>button{
+            margin: auto;
+            width: 150px;
+            height: 50px;
+            border-radius: 30px;
+            border: 4px solid white;
+            background-color: burlywood;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        .content{
+            width: 100%;
+            height:100%;
+            display: flex;
+            position: relative;
+        }
+        .content_left{
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            /* background-color: bisque; */
+            display: flex;
+            justify-content:space-evenly;
+            flex-wrap: wrap;
+        }
+        /* .content_right{
+            width: 30%;
+            height: 300px;
+            position: fixed;
+            right: 0;
+            border-radius: 30px;
+            margin: 20px;
+            background-color: rgb(254, 212, 218);
+        } */
+        .area{
+            width: 220px;
+            height: 300px;
+            margin: 10px;
+            font-size: 20px;
+            background-color: lightgrey;
+            border-radius: 30px;
+            text-align: center;
+        }
+        .area_info>p{
+            margin: 0;
+        }
+        /* .content_right>p{
+            font-size: 30px;
+            margin: 0;
+            padding-left: 20px;
+        } */
+        img{
+            width: 80%;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="all">
+        <div class="nav">
+            <button class="all">全台</button>
+            <button class="north">北部</button>
+            <button class="central">中部</button>
+            <button class="south">南部</button>
+            <button class="east">東部</button>
+            <button class="outlying_islands">離島</button>
+        </div>
+        <div class="content">
+            <div class="content_left">
+                <!-- <div class="area">
+                    <img src="./img/cloud.png" alt="">
+                    <div class="area_info">
+                        <p>地區名稱</p>
+                    </div>
+                </div> -->
+            </div>
+            <!-- <div class="content_right">
+                <img src="" alt="">
+                <p>降雨機率：<span class="cor"></span></p>
+                <p>溫度：<span class="temp"></span></p>
+                <p>體感溫度：<span class="body_temp"></span></p>
+            </div> -->
+        </div>
+    </div>
+    <script>
+        // const city = ['基隆市', '臺北市', '新北市', '桃園市', '臺中市','臺南市','高雄市','新竹市','新竹縣','苗栗縣','彰化縣','南投縣','雲林縣','嘉義縣','嘉義市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣']      
+        // const chance_of_rain = [10,50,100,10,50,100,10,50,100,10,50,100,10,50,100,10,50,100,10,50,100,10]
+        
+        // const temperature = [30,32,35,28,30,32,35,28,30,32,35,28,30,32,35,28,30,32,35,28,30,32]
+        // const body_temperature = [32,34,37,30,32,34,37,30,32,34,37,30,32,34,37,30,32,34,37,30,32,34]
+
+        const content_left = document.querySelector('.content_left')
+        // const content_right = document.querySelector('.content_right')
+
+        // const cor = document.querySelector('.cor')
+        // const temp = document.querySelector('.temp')
+        // const body_temp = document.querySelector('.body_temp')
+
+            // let img_weather
+
+            // if (chance_of_rain[index] == 100) {
+            //     img_weather = "./img/rain.png"    
+            // }else if(chance_of_rain[index] == 50){
+            //     img_weather = "./img/cloud.png"
+            // }else if(chance_of_rain[index] == 10){
+            //     img_weather = "./img/sun.png"
+            // }
+
+            fetch('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-AA300EC1-31BA-465E-B669-6CA2C320A195')
+                        .then(function(response) {
+                            return response.json();
+                        })
+                        .then(function(myJson) {
+                            console.log(myJson) //console會出現資訊,從裡面一層一層找出位置
+
+                            let api_info = myJson.records.location //寫完後覺得前面太長了可以再簡化
+
+                            // for (let index = 0; index < api_info.length; index++) 
+                            // 參考03-foreach 把for迴圈改成foreach
+
+                            api_info.forEach(element => {
+
+                            let location = element.locationName //地區
+                            let minTemp = element.weatherElement[2].time[0].parameter.parameterName //最低溫度
+                            let maxTemp = element.weatherElement[4].time[0].parameter.parameterName //最高溫度
+                            let rain = element.weatherElement[1].time[0].parameter.parameterName //降雨機率
+                            let feel = element.weatherElement[3].time[0].parameter.parameterName //舒適度  
+                            
+                            let img_weather
+
+                                if (rain <= 25) {
+                                    img_weather = "./img/sun.png"    
+                                }else if(rain <= 50){
+                                    img_weather = "./img/cloud.png"
+                                }else{
+                                    img_weather = "./img/rain.png"
+                                }
+                        
+                            content_left.innerHTML = content_left.innerHTML + 
+                                `<div class="area">
+                                    <img src="${ img_weather }" alt="">
+                                    <div class="area_info" data_city="${ location }">
+                                        <p>${ location }</p>                      
+                                        <p>降雨機率：${ rain } %</p>
+                                        <p>氣溫：${ minTemp }°C ～ ${ maxTemp }°C</p>
+                                        <p>舒適度：${ feel }</p>
+                                    </div>
+                                </div>` 
+                            });
+            });
+                
+            
+                //右邊大資訊
+                // const area = document.querySelectorAll('.area')
+                //     for (let index = 0; index < area.length; index++) {
+                //             console.log('area.length'); 
+                //             area[index].onclick = function() {                               
+                //                 cor.innerHTML = chance_of_rain[index] + "%"
+                //                 temp.innerHTML = temperature[index] + "°C"
+                //                 body_temp.innerHTML = body_temperature[index] + "°C"
+                //             }          
+                //     }
+    
+    </script>
+</body>
+</html>
